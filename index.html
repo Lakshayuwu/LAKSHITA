@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Special Letter for Akshu</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Georgia', serif;}
+body, html{height:100%;overflow:hidden;display:flex;justify-content:center;align-items:center;background: linear-gradient(135deg,#fde2e4,#f7d6d6);}
+
+/* PASSWORD SCREEN */
+#lockScreen{position:absolute; inset:0;background: rgba(0,0,0,0.75);display:flex;flex-direction:column;justify-content:center;align-items:center;color:#fff; z-index:1000;padding:20px;}
+#lockScreen input{padding:12px;font-size:16px;border-radius:8px;border:none;outline:none;margin-top:10px;width:80%;max-width:280px;}
+#lockScreen button{margin-top:15px;padding:10px 25px;border-radius:20px;border:none;background:#f4b6c2;font-size:16px;cursor:pointer;}
+
+/* FLOWERS */
+.flower{position:absolute;width:20px;height:20px;background:white;border-radius:50%;opacity:0.9;pointer-events:none;animation:fall linear infinite;}
+@keyframes fall{0%{transform: translateY(-50px) rotate(0deg);}100%{transform: translateY(110vh) rotate(360deg);}}
+
+/* SPARKLES */
+.sparkle{position:absolute;width:6px;height:6px;background:#fff;box-shadow:0 0 8px #fff;border-radius:50%;opacity:0.8;pointer-events:none;animation:sparkleAnim 2s linear infinite;}
+@keyframes sparkleAnim{0%{transform:scale(0.5);opacity:1;}50%{transform:scale(1.2);opacity:0.5;}100%{transform:scale(0.5);opacity:1;}}
+
+/* CONTAINER */
+.container{position:relative;text-align:center;z-index:1;}
+
+/* ENVELOPE */
+.envelope{width:260px;height:180px;background:#fff;position:relative;border-radius:6px;cursor:pointer;box-shadow:0 10px 25px rgba(0,0,0,0.15);animation:float 3s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.envelope::before{content:'';position:absolute;top:0;left:0;width:0;height:0;border-left:130px solid transparent;border-right:130px solid transparent;border-top:90px solid #f4b6c2;}
+
+/* LETTER */
+.letter{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:85%;background:#fffdf8;padding:20px;border-radius:10px;box-shadow:0 5px 25px rgba(0,0,0,0.2);opacity:0;transition:all 1s ease;}
+.letter.open{top:-220px;opacity:1;}
+.letter p{font-size:15px;line-height:1.6;margin-bottom:10px;color:#333;opacity:0;transition:opacity 1s;}
+.letter .title{font-family:'cursive';font-size:20px;margin-bottom:10px;opacity:0;transition:opacity 1s;}
+
+/* SPARKLES AROUND LETTER */
+.letter.sparkles{box-shadow:0 0 30px #fff, 0 0 60px #ffe6f0, 0 0 90px #ffcce0;}
+
+/* TEDDY */
+.teddy{position:absolute;bottom:-150px;left:50%;transform:translateX(-50%);transition:all 1.5s ease;opacity:0;}
+.teddy.show{bottom:20px;opacity:1;}
+.teddy img{width:100px;}
+
+/* I LOVE YOU */
+.loveText{position:absolute;top:30%;left:50%;transform:translateX(-50%);font-size:2rem;color:#f06;opacity:0;transition:1s;}
+.loveText.show{opacity:1;}
+
+/* PLAY BUTTON */
+#playBtn{position:fixed;bottom:20px;right:20px;width:60px;height:60px;border-radius:50%;background:#f4b6c2;display:flex;justify-content:center;align-items:center;font-size:24px;color:white;cursor:pointer;box-shadow:0 5px 15px rgba(0,0,0,0.3);opacity:0;transition:1s; z-index:50;}
+#playBtn.show{opacity:1;}
+
+@media(max-width:480px){.envelope{width:200px;height:150px;}.letter{font-size:14px;}}
+</style>
+</head>
+<body>
+
+<!-- PASSWORD SCREEN -->
+<div id="lockScreen">
+  <h2>This letter is private</h2>
+  <p style="margin-top:8px;font-size:14px;">Enter the password</p>
+  <input type="password" id="password" placeholder="Password" />
+  <button onclick="unlock()">Open</button>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+  <div class="envelope" onclick="openLetter()">
+    <div class="letter" id="letter">
+      <div class="title" id="title">To Akshu,</div>
+      <p>I really miss you… What are you doing all day? Don’t you miss me?</p>
+      <p>I am literally craving for you. I’m sorry for giving you less time.</p>
+      <p>I know my schedule is packed and hectic, but it’s all about understanding.</p>
+      <p>If you feel something is wrong, you can always tell me. I promise to listen.</p>
+      <p>Even when life gets busy, you’re always on my mind.</p>
+      <p style="margin-top:12px;"><strong>Always thinking of you, I am sorry, Akshu ❤️</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- TEDDY -->
+<div class="teddy" id="teddy">
+  <img src="https://i.imgur.com/7Rfqg4K.png" alt="Teddy giving rose">
+</div>
+
+<!-- I LOVE YOU TEXT -->
+<div class="loveText" id="loveText">I LOVE YOU ❤️</div>
+
+<!-- PLAY/PAUSE BUTTON -->
+<div id="playBtn" onclick="toggleMusic()">▶️</div>
+
+<!-- AUDIO -->
+<audio id="bgMusic" src="ThinkinBoutYou.mp3" loop></audio>
+
+<script>
+const correctPassword = "akshu";
+let readingTimer;
+let flowersInterval;
+let sparkleInterval;
+const letterDuration = 25000; // 25 seconds for reading
+const container = document.body;
+const letter = document.getElementById("letter");
+const title = document.getElementById("title");
+
+function unlock(){
+  const input = document.getElementById("password").value;
+  if(input === correctPassword){
+    document.getElementById("lockScreen").style.display="none";
+  }else{alert("Wrong password");}
+}
+
+function openLetter(){
+  letter.classList.add("open","sparkles");
+  startLetterAnimation();
+}
+
+// LETTER LINES FADE-IN
+function startLetterAnimation(){
+  const lines = letter.querySelectorAll("p, .title");
+  lines.forEach((line,i)=>{
+    setTimeout(()=>{line.style.opacity=1;}, i*1200);
+  });
+  startReadingSequence();
+}
+
+// PLAY MUSIC
+const bgMusic = document.getElementById("bgMusic");
+function toggleMusic(){
+  if(bgMusic.paused){ bgMusic.play(); document.getElementById("playBtn").textContent="⏸️"; startFlowers(); }
+  else{ bgMusic.pause(); document.getElementById("playBtn").textContent="▶️"; stopFlowers(); }
+}
+
+// FLOWERS
+let flowerArray = [];
+function createFlower(){
+  const flower = document.createElement('div');
+  flower.classList.add('flower');
+  flower.style.left = Math.random()*100+'vw';
+  flower.style.width = flower.style.height = (15+Math.random()*15)+'px';
+  flower.style.animationDuration = (5+Math.random()*5)+'s';
+  container.appendChild(flower);
+  flowerArray.push(flower);
+  setTimeout(()=>{ flower.remove(); }, 10000);
+}
+function startFlowers(){ flowersInterval = setInterval(createFlower, 300); }
+function stopFlowers(){ clearInterval(flowersInterval); flowerArray.forEach(f=>f.remove()); }
+
+// SPARKLES
+function createSparkle(){
+  const sparkle = document.createElement('div');
+  sparkle.classList.add('sparkle');
+  sparkle.style.top = letter.offsetTop + Math.random()*letter.offsetHeight + 'px';
+  sparkle.style.left = letter.offsetLeft + Math.random()*letter.offsetWidth + 'px';
+  container.appendChild(sparkle);
+  setTimeout(()=>{ sparkle.remove(); }, 2000);
+}
+function startSparkles(){ sparkleInterval = setInterval(createSparkle, 300); }
+function stopSparkles(){ clearInterval(sparkleInterval); }
+
+// READING SEQUENCE
+function startReadingSequence(){
+  // start slow flowers and sparkles
+  flowersInterval = setInterval(createFlower, 600);
+  startSparkles();
+  // after reading duration
+  readingTimer = setTimeout(()=>{
+    // show play/pause button
+    document.getElementById("playBtn").classList.add("show");
+    // show teddy
+    document.getElementById("teddy").classList.add("show");
+    // increase flower speed
+    clearInterval(flowersInterval);
+    flowersInterval = setInterval(createFlower, 300);
+    // show I LOVE YOU
+    document.getElementById("loveText").classList.add("show");
+    // auto play music
+    bgMusic.play().catch(()=>{});
+  }, letterDuration);
+}
+</script>
+
+</body>
+</html>
